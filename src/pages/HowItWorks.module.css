@@ -1,0 +1,13 @@
+/*Updated the mission* classes to steps* to reflect more section accurate*/
+.home {
+  background: linear-gradient(135deg, #214a53 0%, #1a3b42 100%);
+}
+.steps,
+.faqs {
+  background-color: #f5f5f4;
+}
+.stepsMiddleText,
+.faqsMiddletext {
+  width: 50%;
+  margin: 0 auto;
+}
