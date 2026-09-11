@@ -1,4 +1,3 @@
-//outsourced missions qualities and metrics data, removed unused component import.
 import { v4 as uuid } from "uuid";
 import MetricCard from "../components/MetricCard";
 import MissionCard from "../components/MissionCard";
@@ -29,26 +28,14 @@ const AboutUs = () => {
                 participatif peut changer ça.
               </p>
               <div className="row">
-                <div className="col-6 mb-3 mb-md-0 col-">
-                  <MetricCard
-                    value="0%"
-                    description="Défaut"
-                    textAlign="start"
-                  />
+                <div className="col-6 mb-3 mb-md-0">
+                  <MetricCard title="0%" description="Défaut" />
                 </div>
                 <div className="col-6 mb-3 mb-md-0">
-                  <MetricCard
-                    value="8-20%"
-                    description="Rendement"
-                    textAlign="start"
-                  />
+                  <MetricCard title="8-20%" description="Rendement" />
                 </div>
                 <div className="col-12 mb-5 mt-md-3">
-                  <MetricCard
-                    value="100%"
-                    description="Satisfaction"
-                    textAlign="start"
-                  />
+                  <MetricCard title="100%" description="Satisfaction" />
                 </div>
               </div>
             </div>
@@ -72,8 +59,6 @@ const AboutUs = () => {
             </div>
           </div>
         </div>
-        <div id="greenCircle" className="rounded-circle "></div>
-        <div id="yellowCircle" className="rounded-circle"></div>
       </section>
       <section className={`${styles.projects} pt-5 pb-5`}>
         <div className="container">
@@ -121,8 +106,11 @@ const AboutUs = () => {
       <CallToActionSection
         title="Tu partages notre vision ?"
         text="Que tu sois investisseur, porteur de projet ou partenaire — rejoins le mouvement GUINUTY."
-        buttonOneText="Rejoindre GUINUTY"
-        buttonTwoText="Nous contacter"
+        buttonOne={{
+          text: "Rejoindre GUINUTY",
+          offcanvasId: "offcanvasSignUp",
+        }}
+        buttonTwo={{ text: "Voir les projets", link: "/projects" }}
       />
       <section className={`${styles.missions} pt-5 pb-5`}>
         <div className="container">
@@ -145,7 +133,7 @@ const AboutUs = () => {
                 pEnd={2}
                 borderTop={1}
                 border={5}
-                value="Martin Luther Keïta"
+                title="Martin Luther Keïta"
                 position="GÉRANT/CEO"
                 description="Fondateur de GUINUTY et de Tedsom. Pionnier de l'inclusion financière digitale en Guinée."
               />
@@ -159,7 +147,7 @@ const AboutUs = () => {
                 pEnd={2}
                 borderTop={1}
                 border={5}
-                value="Mamadi Conde"
+                title="Mamadi Conde"
                 position="CO-FONDATEUR/COO"
                 description="Opérations et développement commercial. Expert en structuration de projets en Afrique de l'Ouest."
               />
@@ -173,9 +161,9 @@ const AboutUs = () => {
                 pEnd={2}
                 borderTop={1}
                 border={5}
-                value="Salimatou Diallo"
+                title="Salimatou Diallo"
                 position="RELATIONS CLIENTÈLE"
-                description="Interface entre GUINUTY, les investisseurs et les porteurs de projets."
+                description="Interface entre GUINUTY, les investisseurs et les porteurs de projets. En Guinée"
               />
             </div>
           </div>

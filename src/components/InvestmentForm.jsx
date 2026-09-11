@@ -17,7 +17,7 @@ const InvestmentForm = ({ investmentType }) => {
   const investmentField = investmentTypes.find(
     (element) => element.type === investmentType,
   );
-  console.log(investmentField);
+
   return (
     <>
       {investmentType === "loan" && (
@@ -184,10 +184,10 @@ const InvestmentForm = ({ investmentType }) => {
             Voir ici
           </p>
         </div>
-        <Button color="success" width={100} pTop={2} pBottom={2} mBottom={3}>
+        <Button color="success" width={100} padding="py-2" margin="mb-3">
           Valider
         </Button>
-        <Button color="outline-dark" width={100} pTop={2} pBottom={2}>
+        <Button color="outline-dark" width={100} padding="py-2">
           Comment ça marche
         </Button>
       </form>

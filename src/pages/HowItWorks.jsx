@@ -5,6 +5,7 @@ import Button from "../components/Button";
 import styles from "./HowItWorks.module.css";
 import CallToActionSection from "../components/CallToActionSection";
 import { investorSteps, entrepreneurSteps, faqs } from "../utils/dummyDatas";
+import { Link } from "react-router-dom";
 const HowItWorks = () => {
   return (
     <>
@@ -32,26 +33,23 @@ const HowItWorks = () => {
           </p>
           <div className="row">
             <div className="col-md-6 mb-3 mb-md-0 text-md-end">
-              <Button color="warning" pStart={3} pEnd={3} pTop={3} pBottom={3}>
-                Je veux investir
-              </Button>
+              <Link to="/projects">
+                <Button color="warning" padding="p-3">
+                  Je veux investir
+                </Button>
+              </Link>
             </div>
             <div className="col-md-6 text-md-start">
               <Button
                 color="outline-light"
-                pStart={3}
-                pEnd={3}
-                pTop={3}
-                pBottom={3}
+                padding="p-3"
+                offcanvasId="offcanvasSignUp"
               >
                 J'ai un projet
               </Button>
             </div>
           </div>
         </div>
-
-        <div id="greenCircle" className="rounded-circle "></div>
-        <div id="yellowCircle" className="rounded-circle"></div>
       </section>
       <section className={`${styles.steps} pt-5 pb-5`}>
         <div className={`${styles.stepsMiddleText} text-center`}>
@@ -94,8 +92,11 @@ const HowItWorks = () => {
       <CallToActionSection
         title="Prêt à passer à l'acte ?"
         text="Rejoins des centaines d'investisseurs et de porteurs de projets qui construisent la Guinée de demain."
-        buttonOneText="Voir les projets"
-        buttonTwoText="Soumettre un projet"
+        buttonOne={{
+          text: "Soumettre un projet",
+          offcanvasId: "offcanvasSignUp",
+        }}
+        buttonTwo={{ text: "Voir les projets", link: "/projects" }}
       />
       <section className={`${styles.faqs} pt-5 pb-5`}>
         <div className={`${styles.faqsMiddleText} text-center`}>

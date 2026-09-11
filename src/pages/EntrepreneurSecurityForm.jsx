@@ -1,31 +1,41 @@
 import Button from "../components/Button";
 import styles from "./EntrepreneurSecurityForm.module.css";
-
+import {
+  useActionData,
+  useNavigation,
+  useRouteLoaderData,
+} from "react-router-dom";
+import { Form } from "react-router-dom";
 import { useState } from "react";
 
 const EntrepreneurSecurityForm = () => {
   const [showPassword, setShowPassword] = useState(true);
+  const user = useRouteLoaderData("root-data");
+  const navigation = useNavigation();
   return (
     <section className={`${styles.home} pt-5 pb-5`}>
       <div className="container-fluid">
         <small>Dimanche, 6 Avril 2026</small>
         <h1 className="textMainGreen fw-bold">Securite</h1>
-        <p>Ici, vous pouvez modifier vos moyens de connexion a mot de passe.</p>
+        <p>
+          Ici, vous pouvez modifier vos moyens de connexion et votre mot de
+          passe.
+        </p>
         <hr />
         <div className="container bg-light p-3 rounded border">
-          <form>
+          <Form method="patch" action="/user">
+            <input name="request" value="passwordUpdate" hidden></input>
             <div className="row">
-              <div class="mb-3 col-md-4">
-                <label
-                  for="currentPassword"
-                  class="form-label fw-bold textMainGreen"
-                >
-                  🔑 Mot de passe actuelle
+              <div class="mb-3 col-md-6">
+                <label for="password" class="form-label fw-bold textMainGreen">
+                  🔐 Nouveau mot de passe
                 </label>
                 <input
                   type={showPassword ? "text" : "password"}
                   class="form-control"
-                  id="currentPassword"
+                  id="password"
+                  placeholder="monmotdepasse"
+                  name={"password"}
                 />
                 <p
                   type="button"
@@ -37,22 +47,9 @@ const EntrepreneurSecurityForm = () => {
                     : "👁️ Afficher les mots de passe"}
                 </p>
               </div>
-              <div class="mb-3 col-md-4">
+              <div class="mb-3 col-md-6">
                 <label
-                  for="newPassword"
-                  class="form-label fw-bold textMainGreen"
-                >
-                  🔐 Nouveau mot de passe
-                </label>
-                <input
-                  type={showPassword ? "text" : "password"}
-                  class="form-control"
-                  id="newPassword"
-                />
-              </div>
-              <div class="mb-3 col-md-4">
-                <label
-                  for="confirmNewPassword"
+                  for="passwordConfirm"
                   class="form-label fw-bold textMainGreen"
                 >
                   ✔️ Confirmer le nouveau mot de passe
@@ -60,10 +57,33 @@ const EntrepreneurSecurityForm = () => {
                 <input
                   type={showPassword ? "text" : "password"}
                   class="form-control"
-                  id="confirmNewPassword"
+                  id="passwordConfirm"
+                  placeholder="monmotdepasse"
+                  name="passwordConfirm"
                 />
               </div>
+            </div>
 
+            <div className="text-end">
+              {navigation.state === "submitting" ? (
+                <Button padding="px-2" type="button" disabled={true}>
+                  <span
+                    className="spinner-border spinner-border-sm"
+                    aria-hidden="true"
+                  ></span>
+                  <span role="status"> 💾 Sauvegarde en cours...</span>
+                </Button>
+              ) : (
+                <Button padding="px-2" type="submit">
+                  💾 Sauvegarder
+                </Button>
+              )}
+            </div>
+          </Form>
+          <hr />
+          <Form method="patch" action="/user">
+            <input name="request" value="signInOption" hidden></input>
+            <div className="row">
               <div class="mb-3 col-md-6">
                 <label
                   htmlFor="passwordSignIn"
@@ -75,6 +95,7 @@ const EntrepreneurSecurityForm = () => {
                   className="form-select"
                   aria-label="Activer ou desactiver la connexion par mot de passe..."
                   id="passwordSignIn"
+                  name="passwordSignIn"
                   defaultValue="yes"
                 >
                   <option value="yes">🟢 OUI</option>
@@ -93,6 +114,7 @@ const EntrepreneurSecurityForm = () => {
                   aria-label="Activer ou desactiver la connexion par code OTP..."
                   id="otpSignIn"
                   defaultValue="yes"
+                  name="otpSignIn"
                 >
                   <option value="yes">🟢 OUI</option>
                   <option value="no">🔴 NON</option>
@@ -100,11 +122,21 @@ const EntrepreneurSecurityForm = () => {
               </div>
             </div>
             <div className="text-end">
-              <Button color="success" pStart={3} pEnd={3} pTop={3} pBottom={3}>
-                Sauvegarder
-              </Button>
+              {navigation.state === "submitting" ? (
+                <Button padding="px-2" type="button" disabled={true}>
+                  <span
+                    className="spinner-border spinner-border-sm"
+                    aria-hidden="true"
+                  ></span>
+                  <span role="status"> 💾 Sauvegarde en cours...</span>
+                </Button>
+              ) : (
+                <Button padding="px-2" type="submit">
+                  💾 Sauvegarder
+                </Button>
+              )}
             </div>
-          </form>
+          </Form>
         </div>
       </div>
     </section>

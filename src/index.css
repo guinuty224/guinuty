@@ -105,3 +105,6 @@
 .bg-success-gradient {
   background: linear-gradient(140deg, #21aa9a2f, rgba(255, 255, 255, 0.6));
 }
+.bg-success-gradient2 {
+  background: linear-gradient(140deg, #214a53, #0c1f24);
+}

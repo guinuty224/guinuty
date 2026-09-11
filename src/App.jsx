@@ -8,7 +8,7 @@ import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import { useState } from "react";
 import UploadProject from "./pages/UploadProject";
-import EntrepreneurDashboard from "./pages/EntrepreneurDasboard";
+import UserDashboard from "./pages/UserDasboard";
 import EntrepreneurPersonalForm from "./pages/EntrepreneurPersonalForm";
 import UserNavbar from "./components/userNavbar";
 import EntrepreneurSecurityForm from "./pages/EntrepreneurSecurityForm";
@@ -17,50 +17,134 @@ import EntrepreneurKYCForm from "./pages/EntrepreneurKYCForm";
 import EntrepreneurRefund from "./pages/EntrepreneurRefund";
 import EntrepreneurInvestors from "./pages/EntrepreneurInvestors";
 import EntrepreneurUpdate from "./pages/EntrepreneurUpdate";
-import InvestorDashboard from "./pages/InvestorDashboard";
-import InvestorInvestments from "./pages/InvestorInvestments";
-import InvestorRefund from "./pages/InvestorRefund";
-import InvestorUpdate from "./pages/InvestorUpdate";
-import InvestorPersonalForm from "./pages/InvestorPersonalForm";
-import InvestorSecurityForm from "./pages/InvestorSecurityForm";
-import InvestorNotificationForm from "./pages/InvestorNotificationForm";
-import InvestorKYCForm from "./pages/InvestorKYCForm";
+
+import { action as landingWrapperAction } from "./components/LandingWrapper";
+import {
+  loader as userLoader,
+  action as userAction,
+} from "./pages/UserDasboard";
+import { loader as usersLoader } from "./pages/EntrepreneurKYCForm";
+import { loader as userL } from "./pages/UserFile";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import LandingWrapper from "./components/LandingWrapper";
+import EntrepreneurSettingsWrapper from "./components/EntrepreneurSettingsWrapper";
+import EntrepreneurWrapper from "./components/EntrepreneurWrapper";
+import UserFile from "./pages/UserFile";
+
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <LandingWrapper />,
+    action: landingWrapperAction,
+    children: [
+      {
+        index: true,
+        element: <Landing />,
+      },
+      {
+        path: "projects",
+        element: <Projects />,
+      },
+      {
+        path: "steps",
+        element: <HowItWorks />,
+      },
+      {
+        path: "about",
+        element: <AboutUs />,
+      },
+    ],
+  },
+  {
+    path: "/user",
+    element: <EntrepreneurWrapper />,
+    loader: userLoader,
+    id: "root-data",
+    action: userAction,
+    children: [
+      {
+        index: true,
+        element: <UserDashboard />,
+      },
+      {
+        path: "investors",
+        element: <EntrepreneurInvestors />,
+      },
+      {
+        path: "refunds",
+        element: <EntrepreneurRefund />,
+      },
+      {
+        path: "updates",
+        element: <EntrepreneurUpdate />,
+      },
+      {
+        path: "users",
+        element: <EntrepreneurKYCForm />,
+        loader: usersLoader,
+      },
+      {
+        path: "users/:id",
+        element: <UserFile />,
+        loader: userL,
+      },
+      {
+        path: "settings",
+        element: <EntrepreneurSettingsWrapper />,
+        children: [
+          {
+            index: true,
+            element: <EntrepreneurPersonalForm />,
+          },
+          {
+            path: "notifications",
+            element: <EntrepreneurNotificationForm />,
+          },
+          {
+            path: "security",
+            element: <EntrepreneurSecurityForm />,
+          },
+        ],
+      },
+    ],
+  },
+]);
 
 function App() {
-  const [currentView, setCurrentView] = useState(0);
-  return (
-    <>
-      {currentView <= 4 && <Navbar activeLink={currentView} />}
+  return <RouterProvider router={router} />;
+  // return (
+  //   <>
+  //     {currentView <= 4 && <Navbar activeLink={currentView} />}
 
-      {currentView >= 5 && <UserNavbar investor={currentView >= 14} />}
-      {currentView == 0 && <Landing />}
-      {currentView == 1 && <Projects />}
-      {currentView == 2 && <HowItWorks />}
-      {currentView == 3 && <AboutUs />}
-      {currentView == 4 && <Project />}
-      {currentView == 5 && <UploadProject />}
-      {currentView == 6 && <EntrepreneurDashboard />}
-      {currentView == 7 && <EntrepreneurPersonalForm />}
-      {currentView == 8 && <EntrepreneurSecurityForm />}
-      {currentView == 9 && <EntrepreneurNotificationForm />}
-      {currentView == 10 && <EntrepreneurKYCForm />}
-      {currentView == 11 && <EntrepreneurRefund />}
-      {currentView == 12 && <EntrepreneurInvestors />}
-      {currentView == 13 && <EntrepreneurUpdate />}
-      {currentView == 14 && <InvestorDashboard />}
-      {currentView == 15 && <InvestorInvestments />}
-      {currentView == 16 && <InvestorRefund />}
-      {currentView == 17 && <InvestorUpdate />}
-      {currentView == 18 && <InvestorPersonalForm />}
-      {currentView == 19 && <InvestorSecurityForm />}
-      {currentView == 20 && <InvestorNotificationForm />}
-      {currentView == 21 && <InvestorKYCForm />}
-      <Footer
-        userAuth={currentView > 4}
-        onScreenChange={(id) => setCurrentView(id)}
-      />
-    </>
-  );
+  //     {currentView >= 5 && <UserNavbar investor={currentView >= 14} />}
+  //     {currentView == 0 && <Landing />}
+  //     {currentView == 1 && <Projects />}
+  //     {currentView == 2 && <HowItWorks />}
+  //     {currentView == 3 && <AboutUs />}
+  //     {currentView == 4 && <Project />}
+  //     {currentView == 5 && <UploadProject />}
+  //     {currentView == 6 && <EntrepreneurDashboard />}
+  //     {currentView == 7 && <EntrepreneurPersonalForm />}
+  //     {currentView == 8 && <EntrepreneurSecurityForm />}
+  //     {currentView == 9 && <EntrepreneurNotificationForm />}
+  //     {currentView == 10 && <EntrepreneurKYCForm />}
+  //     {currentView == 11 && <EntrepreneurRefund />}
+  //     {currentView == 12 && <EntrepreneurInvestors />}
+  //     {currentView == 13 && <EntrepreneurUpdate />}
+  //     {currentView == 14 && <InvestorDashboard />}
+  //     {currentView == 15 && <InvestorInvestments />}
+  //     {currentView == 16 && <InvestorRefund />}
+  //     {currentView == 17 && <InvestorUpdate />}
+  //     {currentView == 18 && <InvestorPersonalForm />}
+  //     {currentView == 19 && <InvestorSecurityForm />}
+  //     {currentView == 20 && <InvestorNotificationForm />}
+  //     {currentView == 21 && <InvestorKYCForm />}
+  //     <Footer
+  //       userAuth={currentView > 4}
+  //       onScreenChange={(id) => setCurrentView(id)}
+  //     />
+  //   </>
+  // );
 }
 
 export default App;

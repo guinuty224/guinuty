@@ -1,6 +1,6 @@
 .home {
   height: 85vh;
-  background-color: #f5f5f4;
+  background-color: #214a53;
   padding-top: 5rem;
 }
 .missions {
@@ -13,8 +13,5 @@
   .home {
     padding: 5rem 1rem;
     height: auto;
-  }
-  .metricsRow {
-    position: static;
   }
 }

@@ -1,6 +1,5 @@
 import MetricCard from "./MetricCard";
 import FundingProgressBar from "./FundingProgressBar";
-import Button from "./Button";
 import InvestmentForm from "./InvestmentForm";
 import { useState } from "react";
 const FundingCard = ({
@@ -37,27 +36,27 @@ const FundingCard = ({
         <FundingProgressBar collected={collected} goal={goal} />
         <div className="row mt-3">
           <div className="col-md-6 mb-2">
-            <MetricCard value={investors} description="Investisseurs" />
+            <MetricCard title={investors} description="Investisseurs" />
           </div>
           <div className="col-md-6 mb-2">
-            <MetricCard value={remainingDays} description="Restants" />
+            <MetricCard title={remainingDays} description="Restants" />
           </div>
           <div className="col-md-6 mb-2">
-            <MetricCard value={efficiency} description="Rendement" />
+            <MetricCard title={efficiency} description="Rendement" />
           </div>
           <div className="col-md-6 mb-2">
-            <MetricCard value={duration} description="Durée" />
+            <MetricCard title={duration} description="Durée" />
           </div>
           {projectType === "equity" && (
             <>
               <div className="col-md-6 mb-2">
                 <MetricCard
-                  value={remainingParts}
+                  title={remainingParts}
                   description="Parts restantes"
                 />
               </div>
               <div className="col-md-6 mb-2">
-                <MetricCard value={leaveCapital} description="Capital cede" />
+                <MetricCard title={leaveCapital} description="Capital cede" />
               </div>
             </>
           )}

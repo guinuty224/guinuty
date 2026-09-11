@@ -1,6 +1,4 @@
 import { createPortal } from "react-dom";
-import Button from "./Button";
-import SignInForm from "./SignInForm";
 
 const Offcanvas = ({
   id,
@@ -14,6 +12,7 @@ const Offcanvas = ({
       {createPortal(
         <div
           className="offcanvas offcanvas-start"
+          //data-bs-backdrop="false"
           tabIndex="-1"
           id={id}
           aria-labelledby={`${id}Label`}

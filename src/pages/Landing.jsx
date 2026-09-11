@@ -1,20 +1,19 @@
-//Outsourced data into separste file, removed unnecessary imports
 import { v4 as uuid } from "uuid";
 import MetricCard from "../components/MetricCard";
-import MissionCard from "../components/MissionCard";
 import ProjectCard from "../components/ProjectCard";
 import Button from "../components/Button";
 import styles from "./Landing.module.css";
 import CallToActionSection from "../components/CallToActionSection";
-import { homeMetrics, homeMissions, projects } from "../utils/dummyDatas";
+import { data, Link } from "react-router-dom";
+import { homeMetrics, projects } from "../utils/dummyDatas";
 const Landing = () => {
   return (
     <>
-      <section className={`${styles.home}  textMainGreen`}>
+      <section className={`${styles.home}  text-light`}>
         <div className="container">
           {" "}
           <div className="row">
-            <div className="col-md-6 text-center text-md-start">
+            <div className="col-md-6 text-start">
               <span className="badge rounded-pill text-bg-warning">
                 <marquee direction="left" scrollamount="3">
                   La 1re plateforme de financement participatif hybride en
@@ -34,46 +33,40 @@ const Landing = () => {
                 transparent, solidaire et rentable.
               </p>
               <div className="row">
-                <div className="col-md-5 mb-3 text-md-end">
-                  <Button
-                    color="success"
-                    pStart={3}
-                    pEnd={3}
-                    pTop={2}
-                    pBottom={2}
-                  >
-                    Découvrir les projets
-                  </Button>
+                <div className="col-md-5 mb-3 text-end">
+                  <Link to="projects">
+                    <Button color="success" padding="px-3 py-2" type="button">
+                      Découvrir les projets
+                    </Button>
+                  </Link>
                 </div>
-                <div className="col-md-7 text-md-start">
+                <div className="col-md-7 text-end text-md-start ">
                   <Button
-                    color="outline-dark"
-                    pStart={3}
-                    pEnd={3}
-                    pTop={2}
-                    pBottom={2}
+                    color="outline-warning"
+                    padding="px-3 py-2"
+                    type="button"
                   >
                     Soumettre un projet
                   </Button>
                 </div>
               </div>
             </div>
-            <div className="col-md-6">
+            <div className="col-md-6 mt-5 mt-md-0">
               <ProjectCard {...projects[1]} />
             </div>
           </div>
         </div>
       </section>
-      <section className={`${styles.missions} pt-5 pb-5 `}>
-        <div className={`container-fluid ${styles.metricsRow} pt-3`}>
-          <div className={`row `}>
-            {homeMetrics.map((metric) => (
-              <div key={uuid()} className="col-md-3 mb-3">
-                <MetricCard color="success-subtle" {...metric} />
-              </div>
-            ))}
-          </div>
+      <div className={`container-fluid ${styles.metricsRow}`}>
+        <div className={`row `}>
+          {homeMetrics.map((metric) => (
+            <div key={uuid()} className="col-md-3 mb-3">
+              <MetricCard {...metric} />
+            </div>
+          ))}
         </div>
+      </div>
+      <section className={`${styles.missions} pt-5 pb-5 `}>
         <div className={`container ${styles.sectionHeadTexts} pt-3 pb-3`}>
           <small className="textSecondaryGreen text-md-start">
             COMMENT ÇA MARCHE
@@ -87,19 +80,16 @@ const Landing = () => {
               </h2>
             </div>
             <div className="col-md-6 text-md-end">
-              <p>
-                De la soumission à l'exécution, chaque étape
-                <br />
-                structurée avec rigueur et transparence.
-              </p>
+              <p>De la soumission à l'exécution.</p>
+              <p>Chaque étape structurée avec rigueur et transparence.</p>
             </div>
           </div>
         </div>
-        <div className="container bg-white rounded">
+        <div className="container bg-white rounded border-start-md">
           <div className="row ">
             <div className="col-md-4 ">
               <div
-                className={`card customMissionCard text-start rounded-0 border-top-0 border-start-0 border-bottom-0`}
+                className={`card customMissionCard text-start rounded-0 border-0`}
               >
                 <div className="card-body">
                   <p className="step">1</p>
@@ -108,28 +98,28 @@ const Landing = () => {
                     Tu soumets ton projet
                   </h5>
                   <p className="card-text fw-light">
-                    Présente ton besoin, ton modèle et le montant. Notre équipe
-                    analyse avant toute publication.
+                    Présente ton besoin. L'équipe valide tout avant la parution.
                   </p>
                 </div>
               </div>
+              <hr />
             </div>
             <div className="col-md-4 ">
               <div
-                className={`card customMissionCard text-start rounded-0 border-top-0 border-start-0 border-bottom-0`}
+                className={`card customMissionCard text-start rounded-0 border-0`}
               >
                 <div className="card-body">
                   <p className="step">2</p>
 
                   <h5 className="card-title  fw-bold textMainGreen">
-                    La communauté finance
+                    Le public te soutient
                   </h5>
                   <p className="card-text fw-light">
-                    Ton projet est publié. Chaque franc est tracé en temps réel
-                    par la communauté.
+                    Ton projet est en ligne. Chaque franc est suivi en direct.
                   </p>
                 </div>
               </div>
+              <hr />
             </div>
             <div className="col-md-4 ">
               <div
@@ -139,14 +129,14 @@ const Landing = () => {
                   <p className="step">3</p>
 
                   <h5 className="card-title  fw-bold textMainGreen">
-                    Tu exécutes, on suit
+                    Tu crées et l'on suit
                   </h5>
                   <p className="card-text fw-light">
-                    Les fonds sont débloqués. Tu reportes l'avancement. Les
-                    remboursements sont planifiés.
+                    Les fonds sont libérés, tu partages l'avancée du travail.
                   </p>
                 </div>
               </div>
+              <hr className="d-none d-md-block" />
             </div>
           </div>
         </div>
@@ -159,12 +149,11 @@ const Landing = () => {
               <h2 className="textMainGreen">Soutenez un projet aujourd'hui</h2>
             </div>
             <div className="col-lg-6 d-none d-md-block text-end">
-              <button
-                className="btn btn-outline-dark rounded-pill"
-                type="submit"
-              >
-                Voir tous les projets
-              </button>
+              <Link to="projects">
+                <Button color="success" padding="px-3 py-2" type="button">
+                  Découvrir les projets
+                </Button>
+              </Link>
             </div>
           </div>
           <div className="row">
@@ -174,12 +163,13 @@ const Landing = () => {
               </div>
             ))}
           </div>
-          <button
-            className="btn btn-outline-dark rounded-pill w-100 d-md-none"
-            type="submit"
-          >
-            Voir tous les projets
-          </button>
+          <div className="d-md-none">
+            <Link to="projects">
+              <Button color="success" padding="px-3 py-2" type="button">
+                Découvrir les projets
+              </Button>
+            </Link>
+          </div>
         </div>
       </section>
       <section className={`${styles.missions} pt-5 pb-5 `}>
@@ -193,13 +183,13 @@ const Landing = () => {
                 Le bon mécanisme pour chaque projet
               </h2>
               <p>
-                GUINUTY accompagne le cycle de vie complet — du don solidaire à
+                GUINUTY accompagne le cycle de vie complet. Du don solidaire à
                 l'entrée en capital.
               </p>
             </div>
             <div className="col-md-8 text-start">
               <div>
-                <h5 className="card-title  fw-bold textMainGreen">DON</h5>
+                <h5 className="card-title  fw-bold textMainGreen">Don</h5>
                 <p className="card-text fw-light">
                   Pour des projets à impact communautaire ou culturel. Les
                   contributeurs donnent selon leurs moyens, sans retour
@@ -231,11 +221,22 @@ const Landing = () => {
         title="Prêt à faire grandir vos idées ?"
         text=" Rejoignez la communauté GUINUTY, que vous soyez porteur de projet ou
           investisseur."
-        buttonOneText="Créer un compte"
-        buttonTwoText="Comment ça marche"
+        buttonOne={{
+          text: "Créer un compte",
+          offcanvasId: "offcanvasSignUp",
+        }}
+        buttonTwo={{ text: "Comment ça marche", link: "steps" }}
       />
     </>
   );
 };
 
 export default Landing;
+
+const loader = async ({ request, params }) => {
+  const response = await fetch();
+
+  if (!response.ok) {
+    throw data();
+  }
+};
