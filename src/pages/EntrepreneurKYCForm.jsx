@@ -76,13 +76,16 @@ export const loader = async ({ request, params }) => {
     return redirect("/");
   }
   try {
-    const response = await fetch("http://localhost:8000/user/users", {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${userData?.token}`,
+    const response = await fetch(
+      "https://guinuty-0aaf959abbbf.herokuapp.com/user/users",
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${userData?.token}`,
+        },
       },
-    });
+    );
     const data = await response.json();
     if (!response.ok) {
       Swal.fire({

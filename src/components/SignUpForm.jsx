@@ -1,11 +1,22 @@
 import { useNavigation, useActionData } from "react-router-dom";
-
+import { useState } from "react";
+import { countryCodes } from "../utils/dummyDatas";
 import Button from "./Button";
 import { Form } from "react-router-dom";
 const SignUpForm = () => {
   const navigation = useNavigation();
   const actionData = useActionData();
-
+  const [phone, setPhone] = useState({
+    countryCode: "+224",
+    phoneNumber: "",
+  });
+  const onPhoneChange = (e) => {
+    const { name, value } = e.target;
+    setPhone((prevValue) => ({
+      ...prevValue,
+      [name]: value,
+    }));
+  };
   return (
     <Form method="POST" className="bg-light p-2 rounded">
       {actionData?.phone ? (
@@ -42,7 +53,7 @@ const SignUpForm = () => {
               name="otp"
               aria-describedby="userOtpHelp"
               placeholder="Votre code OTP..."
-              required
+              defaultValue={""}
             />
 
             <div id="userOtpHelp" className="form-text">
@@ -51,13 +62,35 @@ const SignUpForm = () => {
             </div>
           </div>
 
-          <Button width={100} padding="px-1" type="submit">
-            🔐 Se connecter
-          </Button>
+          {navigation.state === "submitting" ? (
+            <Button width={100} padding="px-1" type="button" disabled={true}>
+              <span
+                className="spinner-border spinner-border-sm"
+                aria-hidden="true"
+              ></span>
+              <span role="status"> 🔐 Verification...</span>
+            </Button>
+          ) : (
+            <>
+              <Button width={100} padding="px-1" type="submit">
+                🔐 Se connecter
+              </Button>
+              <hr />
+              <Button
+                color="outline-dark"
+                width={100}
+                padding="px-1"
+                name="request"
+                value="reset"
+              >
+                📱 Modifier le tel
+              </Button>
+            </>
+          )}
         </>
       ) : (
         <>
-          {" "}
+          <input hidden name="request" value="signUp" />{" "}
           <div className="mb-3">
             <label
               htmlFor="userFullname"
@@ -74,10 +107,6 @@ const SignUpForm = () => {
               placeholder="Votre nom complet ..."
               required
             />
-
-            {/* <div id="userFullnameHelp" className="form-text">
-          Vous recevrez un code pour vous creer votre compte et le finaliser.
-        </div> */}
           </div>
           <div class="mb-3">
             <label
@@ -98,21 +127,48 @@ const SignUpForm = () => {
             </select>
           </div>
           <div className="mb-3">
-            <label
-              htmlFor="userPhone"
-              className="form-label fw-bold textMainGreen"
-            >
-              📱 Tel
-            </label>
             <input
-              type="tel"
-              className="form-control "
-              id="userPhone"
               name="phone"
-              aria-describedby="userPhoneHelp"
-              placeholder="Votre numero de tel..."
-              required
+              value={phone.countryCode + phone.phoneNumber}
+              hidden
             />
+            <div className="mb-3">
+              <label htmlFor="phoneNumber" className="form-label fw-semibold">
+                📱 Tel
+              </label>
+
+              {/* Input Group Bootstrap */}
+              <div className="input-group">
+                {/* Select Indicatif Pays */}
+                <select
+                  className="form-select bg-light text-secondary"
+                  style={{ maxWidth: "120px" }}
+                  name="countryCode"
+                  aria-label="Indicatif pays"
+                  value={phone.countryCode}
+                  onChange={onPhoneChange}
+                  required
+                >
+                  {countryCodes.map((code) => (
+                    <option key={code.label} value={code.code}>
+                      {code.label}
+                    </option>
+                  ))}
+                </select>
+
+                {/* Champ Numéro de Téléphone */}
+                <input
+                  type="tel"
+                  className="form-control"
+                  id="phoneNumber"
+                  name="phoneNumber"
+                  placeholder="Votre numero de telephone"
+                  value={phone.phoneNumber}
+                  onChange={onPhoneChange}
+                  required
+                />
+              </div>
+            </div>
 
             <div id="userPhoneHelp" className="form-text">
               Vous recevrez un code pour vous creer votre compte et le
@@ -125,12 +181,14 @@ const SignUpForm = () => {
                 className="spinner-border spinner-border-sm"
                 aria-hidden="true"
               ></span>
-              <span role="status"> Verification...</span>
+              <span role="status"> 📱 Verification...</span>
             </Button>
           ) : (
-            <Button width={100} padding="px-1" type="submit">
-              📲 Envoyer un code
-            </Button>
+            <>
+              <Button width={100} padding="px-1" type="submit">
+                📲 Envoyer un code
+              </Button>
+            </>
           )}
         </>
       )}

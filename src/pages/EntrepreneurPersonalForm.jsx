@@ -4,6 +4,7 @@ import { v4 as uuid } from "uuid";
 import { useFetcher } from "react-router-dom";
 import { countries, nationalities } from "../utils/dummyDatas";
 import { FileUploaderRegular } from "@uploadcare/react-uploader";
+import { QRCodeCanvas } from "qrcode.react";
 import "@uploadcare/react-uploader/core.css";
 import {
   useActionData,
@@ -12,13 +13,14 @@ import {
 } from "react-router-dom";
 import { Form } from "react-router-dom";
 import { useState } from "react";
+import today from "../utils/today";
 
 const EntrepreneurPersonalForm = () => {
   const fetcher = useFetcher();
   const navigation = useNavigation();
   const user = useRouteLoaderData("root-data");
   const actionData = fetcher.data;
-  console.log(actionData);
+
   const [selects, setSelects] = useState({
     country: user.country,
     nationality: user.nationality,
@@ -39,8 +41,9 @@ const EntrepreneurPersonalForm = () => {
       uuid,
       cdnUrl,
     }));
+    console.log(file);
     setSelects((prevState) => {
-      return { ...prevState, selfie: file[0].cdnUrl };
+      return { ...prevState, selfie: file[0].uuid };
     });
   };
   const handleIdUploadSuccess = (state) => {
@@ -48,20 +51,29 @@ const EntrepreneurPersonalForm = () => {
       uuid,
       cdnUrl,
     }));
+    console.log(file);
     setSelects((prevState) => {
-      return { ...prevState, idDoc: file[0].cdnUrl };
+      return { ...prevState, idDoc: file[0].uuid };
     });
   };
+  const formatKycDate = (dateValue) => {
+    if (!dateValue) return "Non vérifié";
 
+    return new Intl.DateTimeFormat("fr-FR", {
+      day: "numeric",
+      month: "long", // "long" -> septembre | "2-digit" -> 09 | "short" -> sept.
+      year: "numeric",
+    }).format(new Date(dateValue));
+  };
   return (
     <section className={`${styles.home} pt-5 pb-5`}>
       <div className="container-fluid">
-        <small>Dimanche, 6 Avril 2026</small>
+        <small>{today()}</small>
         <h1 className="textMainGreen fw-bold">Informations personnelles</h1>
         <p>Ici, vous pouvez modifier vos informations personnelles.</p>
         <hr />
         <div className="container bg-light p-3 rounded border">
-          <Form method="patch" action="/user">
+          <fetcher.Form method="patch" action="/dashboard">
             <div className="row">
               <div class="mb-3 col-md-4">
                 <label for="fullname" class="form-label fw-bold textMainGreen">
@@ -134,7 +146,7 @@ const EntrepreneurPersonalForm = () => {
               </div>
             </div>
             <div className="text-end">
-              {navigation.state === "submitting" ? (
+              {fetcher.state === "submitting" ? (
                 <Button padding="px-2" type="button" disabled={true}>
                   <span
                     className="spinner-border spinner-border-sm"
@@ -148,163 +160,87 @@ const EntrepreneurPersonalForm = () => {
                 </Button>
               )}
             </div>
-          </Form>
+          </fetcher.Form>
           <hr />
-          {
-            (user.role = "administrator" && (
-              <div className="bg-success-gradient2 rounded p-3 text-light fw-bold mb-3">
-                <span role="status"> ✅ Vérification Automatique</span>
-                <p>
-                  Vos privilèges d'administrateur valident automatiquement votre
-                  compte. Aucune vérification KYC n'est nécessaire.
-                </p>
-              </div>
-            ))
-          }
-          {user.verified === "ongoing" && (
-            <div>
-              <div className="row">
-                <div className="mb-3 col-md-6">
-                  <a
-                    className="btn d-block btn-sm btn-dark rounded mt-2"
-                    href={selects.selfie}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    🤳 Voir mon selfie
-                  </a>
-                </div>
-                <div className="mb-3 col-md-6">
-                  <a
-                    className="btn d-block btn-sm btn-dark rounded mt-2"
-                    href={selects.idDoc}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    🪪 Voir ma piece d'identité
-                  </a>
-                </div>
-              </div>
-              <div className="bg-danger rounded p-3 text-light fw-bold mb-3">
-                <span
-                  className="spinner-border spinner-border-sm"
-                  aria-hidden="true"
-                ></span>
-                <span role="status"> ✅ Verification en cours...</span>
-                <p>
-                  Ces documents sont en cours de verification. Aucune autre
-                  soumission ne sera possible tant que la vérification en cours
-                  n'aura pas été validée ou refusée.
-                </p>
-              </div>
+          {user.role == "administrator" && (
+            <div className="bg-success-gradient2 rounded p-3 text-light fw-bold mb-3">
+              <span role="status"> ✅ Vérification Automatique</span>
+              <p>
+                Vos privilèges d'administrateur valident automatiquement votre
+                compte. Aucune vérification KYC n'est nécessaire.
+              </p>
             </div>
           )}
-          {user.verified === "no" && (
-            <Form method="patch" action="/user">
-              <input name="request" value="verification" hidden></input>
-              <div className="row">
-                <div className="mb-3 col-md-6">
-                  <label
-                    for="formFile"
-                    class="form-label fw-bold textMainGreen"
-                  >
-                    🤳 Ajouter un selfie
-                  </label>
-                  <FileUploaderRegular
-                    pubkey="36702f41b78321885c1e"
-                    imgOnly={true}
-                    multiple={false}
-                    sourceList="local"
-                    accept="image/*"
-                    onCommonUploadSuccess={handleSelfieUploadSuccess}
-                    useCloudImageEditor={false}
-                    useLocalImageEditor={false}
-                    localeName="fr"
-                  />
-                  <input name="selfie" value={selects.selfie} hidden></input>
-                  {selects.selfie && (
-                    <a
-                      className="btn btn-sm btn-dark rounded mt-2"
-                      href={selects.selfie}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      Voir le document
-                    </a>
-                  )}
-                </div>
-                <div className="mb-3 col-md-6">
-                  <label
-                    for="formFile"
-                    class="form-label fw-bold textMainGreen"
-                  >
-                    🪪 Ajouter une piece d'identité
-                  </label>
-                  <FileUploaderRegular
-                    pubkey="36702f41b78321885c1e"
-                    imgOnly={false}
-                    multiple={false}
-                    sourceList="local"
-                    accept="application/pdf*"
-                    onCommonUploadSuccess={handleIdUploadSuccess}
-                    useCloudImageEditor={false}
-                    useLocalImageEditor={false}
-                    localeName="fr"
-                  />
-                  <input name="idDoc" value={selects.idDoc} hidden></input>
-                  {selects.idDoc && (
-                    <a
-                      className="btn btn-sm btn-dark rounded mt-2"
-                      href={selects.idDoc}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      Voir le document
-                    </a>
-                  )}
-                </div>
-              </div>
-              <div className="bg-danger rounded p-3 text-light fw-bold mb-3">
+          {!user.kycVerified && (
+            <>
+              <div className="bg-success-gradient2 rounded p-3 text-light  mb-3">
+                <span role="status" className="fw-bold">
+                  {" "}
+                  🪪 Vérification d'identité (KYC)
+                </span>
+                <ul>
+                  <li>
+                    ⏱️ Rapide : Prend moins d'une minute.Le code restera
+                    toujours disponible ici.
+                  </li>
+                  <li>
+                    📋 Requis : Une pièce d'identité valide et votre caméra
+                    frontale 📸.
+                  </li>
+                  <li>
+                    🛡️ Avantage : Un statut vérifié booste la confiance de la
+                    communauté et s'affiche sur tous vos projets !
+                  </li>
+                </ul>
                 <p>
-                  Ces documents serviront à vérifier votre compte. Pour
-                  accélérer la procédure, veillez à fournir un selfie bien clair
-                  et une pièce d'identité lisible au format PDF. Aucune autre
-                  soumission ne sera possible tant que la vérification en cours
-                  n'aura pas été validée ou refusée.
+                  Si vous avez déjà terminé votre KYC et souhaitez actualiser
+                  votre statut immédiatement sans attendre la mise à jour
+                  automatique, cliquez sur le bouton ci-dessous.
                 </p>
               </div>
-
-              {user.verified === "ongoing" ? (
-                <Button padding="px-2" type="button" disabled={true}>
-                  <span
-                    className="spinner-border spinner-border-sm"
-                    aria-hidden="true"
-                  ></span>
-                  <span role="status"> ✅ Verification en cours...</span>
-                </Button>
-              ) : (
-                <div className="text-end">
-                  {navigation.state === "submitting" ? (
-                    <Button padding="px-2" type="button" disabled={true}>
-                      <span
-                        className="spinner-border spinner-border-sm"
-                        aria-hidden="true"
-                      ></span>
-                      <span role="status"> ✅ Envoi en cours...</span>
-                    </Button>
-                  ) : (
-                    <Button padding="px-2" type="submit">
-                      ✅ Verifier mon identité
-                    </Button>
-                  )}
-                </div>
-              )}
-            </Form>
+              <fetcher.Form method="post" action="/dashboard">
+                <input name="request" value="kyc" hidden />
+                {fetcher.state === "submitting" ? (
+                  <Button padding="px-2" type="button" disabled={true}>
+                    <span
+                      className="spinner-border spinner-border-sm"
+                      aria-hidden="true"
+                    ></span>
+                    <span role="status"> 🔄 Actualisation en cours...</span>
+                  </Button>
+                ) : (
+                  <Button padding="px-2" type="submit">
+                    🔄 Actualiser mon statut
+                  </Button>
+                )}
+              </fetcher.Form>
+              <div className="text-center">
+                <QRCodeCanvas value={user.kycVerificationLink} />
+              </div>
+            </>
           )}
-
+          {user.kycVerified && (
+            <div className="bg-success-gradient2 rounded p-3 text-light fw-bold mb-3">
+              <span role="status"> ✅ Vérification KYC Valider</span>
+              <p>
+                Votre identité a été vérifiée avec succès ! Votre statut vérifié
+                est désormais actif et visible sur l'ensemble de vos projets.
+              </p>
+              <p>📅 Valide jusqu'au : {formatKycDate(user.kycVerifiedEndAt)}</p>
+            </div>
+          )}
+          {!actionData?.details?.approved && (
+            <ul class="list-group list-group-flush p-2 mt-3">
+              {actionData?.details?.rejectionReasons.map((reason) => (
+                <li class="list-group-item fw-bold text-danger" key={uuid()}>
+                  {reason}
+                </li>
+              ))}
+            </ul>
+          )}
           <hr />
-          <fetcher.Form method="patch" action="/user">
-            <input name="request" value="updatePhone" hidden></input>
+          <fetcher.Form method="patch" action="/dashboard">
+            <input name="request" value="phoneNumberUpdate" hidden></input>
             <div className="row">
               <div className="mb-3 col-md-6">
                 <label

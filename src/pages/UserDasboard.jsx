@@ -2,29 +2,26 @@ import MetricCard from "../components/MetricCard";
 import ProjectCard from "../components/ProjectCard";
 import { formatCompactNumber } from "../utils/formaters";
 import styles from "./UserDashboard.module.css";
+
 import { useRouteLoaderData } from "react-router-dom";
 import Button from "../components/Button";
 import Swal from "sweetalert2";
 import { redirect } from "react-router-dom";
+import getLocalStorage from "../utils/getLocalStorage";
+import { errorToast, successToast, infoToast } from "../utils/toast";
+import objectFromFormData from "../utils/objectFromFormData";
+import errorCodes from "../utils/errorCodes";
+import closeAllOffcanvas from "../utils/closeAllOffcanvas";
+import today from "../utils/today";
 
-const userDashboard = () => {
+const UserDashboard = () => {
   const user = useRouteLoaderData("root-data");
-  const today = new Date();
-
-  const formattedDate = today.toLocaleDateString("fr-FR", {
-    weekday: "long",
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  });
-  const date = formattedDate
-    .replace(/^./, (str) => str.toUpperCase())
-    .replace(/(\s[a-z])/g, (str) => str.toUpperCase());
+  console.log(user);
 
   return (
     <section className={`${styles.home} pt-5 pb-5`}>
       <div className="container-fluid">
-        <small>{date}</small>
+        <small>{today()}</small>
         <h1 className="textMainGreen fw-bold">Vue d'ensemble</h1>
         <h3>
           {user.fullname} | {user.role.toUpperCase()}
@@ -100,296 +97,153 @@ const userDashboard = () => {
     </section>
   );
 };
-export default userDashboard;
+export default UserDashboard;
 export const loader = async ({ request, params }) => {
-  const storedUser = localStorage.getItem("userData");
-  const userData = storedUser ? JSON.parse(storedUser) : null;
-  if (!userData) {
+  if (!getLocalStorage()) {
     return redirect("/");
   }
+  const { token, id } = getLocalStorage();
   try {
-    const response = await fetch("http://localhost:8000/user", {
-      body: JSON.stringify({ userId: userData.userId }),
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${userData?.token}`,
+    const response = await fetch(
+      "https://guinuty-0aaf959abbbf.herokuapp.com/user",
+      {
+        body: JSON.stringify({ id }),
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
       },
-    });
+    );
     const data = await response.json();
     if (!response.ok) {
-      Swal.fire({
-        title: `Erreur : ${response.status}`,
-        text: data.message,
-        icon: "error",
-        toast: true,
-        position: "bottom-end",
-        timer: 10000,
-        timerProgressBar: true,
-        showConfirmButton: false,
-      });
-      return redirect("/");
+      if (response.status === 401) {
+        localStorage.clear();
+        closeAllOffcanvas();
+        errorToast(data);
+        return redirect("/");
+      }
+      errorToast(data);
+      return null;
     }
-
-    return { ...data._doc };
+    console.log(data);
+    return data;
   } catch (error) {
-    console.log(error);
+    errorToast(error);
+    return null;
   }
 };
 export const action = async ({ request, params }) => {
-  const formData = await request.formData();
-  const dataObject = Object.fromEntries(formData);
-  const storedUser = localStorage.getItem("userData");
-  const userData = storedUser ? JSON.parse(storedUser) : null;
+  const body = await objectFromFormData(request);
+  const { token } = getLocalStorage();
+  if (!token) {
+    return redirect("/");
+  }
+  switch (body.request) {
+    case "kyc": {
+      try {
+        const response = await fetch(
+          "https://guinuty-0aaf959abbbf.herokuapp.com/user/settings/verification",
+          {
+            method: "get",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          },
+        );
+        const data = await response.json();
 
-  if (dataObject.request === "verification") {
-    if (dataObject.selfie.length === 0 || dataObject.idDoc.length === 0) {
-      Swal.fire({
-        title: `Erreur`,
-        text: "Vous devez fournir un selfie et une piece d'identité.",
-        icon: "error",
-        toast: true,
-        position: "bottom-end",
-        timer: 10000,
-        timerProgressBar: true,
-        showConfirmButton: false,
-      });
-      return redirect("/user/settings");
-    }
-    try {
-      const response = await fetch(
-        "http://localhost:8000/user/settings/verification",
-        {
-          body: JSON.stringify(dataObject),
-          method: request.method,
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${userData?.token}`,
-          },
-        },
-      );
-      const data = await response.json();
-      if (!response.ok) {
-        Swal.fire({
-          title: `Erreur : ${response.status}`,
-          text: data.message,
-          icon: "error",
-          toast: true,
-          position: "bottom-end",
-          timer: 10000,
-          timerProgressBar: true,
-          showConfirmButton: false,
-        });
-        return redirect("/");
+        if (!response.ok) {
+          if (response.status === 401) {
+            localStorage.clear();
+            closeAllOffcanvas();
+            errorToast(data);
+            return redirect("/");
+          }
+          console.log(data);
+          infoToast(data);
+          return null;
+        }
+        console.log(data);
+        infoToast(data);
+        return null;
+      } catch (error) {
+        errorToast(error);
+        return null;
       }
-      Swal.fire({
-        title: "Success",
-        text: data.message,
-        icon: "info",
-        toast: true,
-        position: "bottom-end",
-        timer: 10000,
-        timerProgressBar: true,
-        showConfirmButton: false,
-      });
-      return redirect("/user/settings");
-    } catch (error) {
-      Swal.fire({
-        title: `Erreur : ${error.code}`,
-        text: error.message,
-        icon: "error",
-        toast: true,
-        position: "bottom-end",
-        timer: 10000,
-        timerProgressBar: true,
-        showConfirmButton: false,
-      });
-      return redirect("/user/settings");
+      break;
     }
-  } else if (dataObject.request === "updatePhone") {
-    try {
-      const response = await fetch(
-        "http://localhost:8000/user/settings/phone",
-        {
-          body: JSON.stringify(dataObject),
-          method: request.method,
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${userData?.token}`,
-          },
-        },
-      );
-      const data = await response.json();
-      if (!response.ok) {
-        Swal.fire({
-          title: `Erreur : ${response.status}`,
-          text: data.message,
-          icon: "error",
-          toast: true,
-          position: "bottom-end",
-          timer: 10000,
-          timerProgressBar: true,
-          showConfirmButton: false,
-        });
-        return redirect("/");
-      }
-      Swal.fire({
-        title: "Success",
-        text: data.message,
-        icon: "success",
-        toast: true,
-        position: "bottom-end",
-        timer: 10000,
-        timerProgressBar: true,
-        showConfirmButton: false,
-      });
-      console.log(data);
-      return { ...data };
-    } catch (error) {
-      Swal.fire({
-        title: `Erreur : ${error.code}`,
-        text: error.message,
-        icon: "error",
-        toast: true,
-        position: "bottom-end",
-        timer: 10000,
-        timerProgressBar: true,
-        showConfirmButton: false,
-      });
-      return redirect("/user/settings");
-    }
-  } else if (dataObject.request === "passwordUpdate") {
-    try {
-      const response = await fetch(
-        "http://localhost:8000/user/settings/password",
-        {
-          body: JSON.stringify(dataObject),
-          method: request.method,
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${userData?.token}`,
-          },
-        },
-      );
-      const data = await response.json();
-      if (!response.ok) {
-        Swal.fire({
-          title: `Erreur : ${response.status}`,
-          text: data.message,
-          icon: "error",
-          toast: true,
-          position: "bottom-end",
-          timer: 10000,
-          timerProgressBar: true,
-          showConfirmButton: false,
-        });
-        return redirect("/");
-      }
-      Swal.fire({
-        title: "Success",
-        text: data.message,
-        icon: "success",
-        toast: true,
-        position: "bottom-end",
-        timer: 10000,
-        timerProgressBar: true,
-        showConfirmButton: false,
-      });
 
-      return redirect("/user/settings/security");
-    } catch (error) {
-      Swal.fire({
-        title: `Erreur : ${error.code}`,
-        text: error.message,
-        icon: "error",
-        toast: true,
-        position: "bottom-end",
-        timer: 10000,
-        timerProgressBar: true,
-        showConfirmButton: false,
-      });
-      redirect("/user/settings/security");
-    }
-  } else if (dataObject.request === "signInOption") {
-    if (dataObject.passwordSignIn === "no" && dataObject.otpSignIn === "no") {
-      Swal.fire({
-        title: `Erreur`,
-        text: "Veuillez activer au moins une option pour pouvoir vous connecter.",
-        icon: "error",
-        toast: true,
-        position: "bottom-end",
-        timer: 10000,
-        timerProgressBar: true,
-        showConfirmButton: false,
-      });
-      return redirect("/user/settings/security");
-    }
-    try {
-      const response = await fetch(
-        "http://localhost:8000/user/settings/signin",
-        {
-          body: JSON.stringify(dataObject),
-          method: request.method,
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${userData?.token}`,
+    case "phoneNumberUpdate": {
+      try {
+        const response = await fetch(
+          "https://guinuty-0aaf959abbbf.herokuapp.com/user/settings/phone",
+          {
+            body: JSON.stringify(body),
+            method: request.method,
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
           },
-        },
-      );
-      const data = await response.json();
-      if (!response.ok) {
-        Swal.fire({
-          title: `Erreur : ${response.status}`,
-          text: data.message,
-          icon: "error",
-          toast: true,
-          position: "bottom-end",
-          timer: 10000,
-          timerProgressBar: true,
-          showConfirmButton: false,
-        });
-        return redirect("/");
+        );
+        const data = await response.json();
+        if (!response.ok) {
+          if (response.status === 401) {
+            localStorage.clear();
+            closeAllOffcanvas();
+            errorToast(data);
+            return redirect("/");
+          }
+          errorToast(data);
+          return null;
+        }
+        successToast(data);
+        return data;
+      } catch (error) {
+        errorToast(error);
+        return null;
       }
-      Swal.fire({
-        title: "Success",
-        text: data.message,
-        icon: "success",
-        toast: true,
-        position: "bottom-end",
-        timer: 10000,
-        timerProgressBar: true,
-        showConfirmButton: false,
-      });
-
-      return redirect("/user/settings/security");
-    } catch (error) {
-      Swal.fire({
-        title: `Erreur : ${error.code}`,
-        text: error.message,
-        icon: "error",
-        toast: true,
-        position: "bottom-end",
-        timer: 10000,
-        timerProgressBar: true,
-        showConfirmButton: false,
-      });
-      redirect("/user/settings/security");
     }
-  } else {
-    try {
-      const response = await fetch("http://localhost:8000/user/settings", {
-        body: JSON.stringify(dataObject),
-        method: request.method,
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${userData?.token}`,
-        },
-      });
-      const data = await response.json();
-      if (!response.ok) {
+    case "passwordUpdate": {
+      try {
+        const response = await fetch(
+          "https://guinuty-0aaf959abbbf.herokuapp.com/user/settings/password",
+          {
+            body: JSON.stringify(body),
+            method: request.method,
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          },
+        );
+        const data = await response.json();
+        if (!response.ok) {
+          if (response.status === 401) {
+            console.log("Je suis laaa");
+            localStorage.clear();
+            closeAllOffcanvas();
+            errorToast(data);
+            return redirect("/");
+          }
+          errorToast(data);
+          return null;
+        }
+        successToast(data);
+        return null;
+      } catch (error) {
+        errorToast(error);
+        return null;
+      }
+      break;
+    }
+    case "signInOptionUpdate": {
+      if (body.passwordSignIn === "false" && body.otpSignIn === "false") {
         Swal.fire({
-          title: `Erreur : ${response.status}`,
-          text: data.message,
+          title: `Erreur`,
+          text: "Veuillez activer au moins une option pour pouvoir vous connecter.",
           icon: "error",
           toast: true,
           position: "bottom-end",
@@ -397,31 +251,103 @@ export const action = async ({ request, params }) => {
           timerProgressBar: true,
           showConfirmButton: false,
         });
-        return redirect("/");
+        return {};
       }
-      Swal.fire({
-        title: "Changements enregistrés",
-        text: data.message,
-        icon: "success",
-        toast: true,
-        position: "bottom-end",
-        timer: 10000,
-        timerProgressBar: true,
-        showConfirmButton: false,
-      });
-      return redirect("/user/settings");
-    } catch (error) {
-      Swal.fire({
-        title: `Erreur : ${error.code}`,
-        text: error.message,
-        icon: "error",
-        toast: true,
-        position: "bottom-end",
-        timer: 10000,
-        timerProgressBar: true,
-        showConfirmButton: false,
-      });
-      return redirect("/user/settings");
+      try {
+        const response = await fetch(
+          "https://guinuty-0aaf959abbbf.herokuapp.com/user/settings/signin",
+          {
+            body: JSON.stringify(body),
+            method: request.method,
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          },
+        );
+        const data = await response.json();
+        if (!response.ok) {
+          if (response.status === 401) {
+            localStorage.clear();
+            closeAllOffcanvas();
+            errorToast(data);
+            return redirect("/");
+          }
+          errorToast(data);
+          return {};
+        }
+        successToast(data);
+        return {};
+      } catch (error) {
+        errorToast(error);
+        return {};
+      }
+    }
+    case "projectReview": {
+      try {
+        const response = await fetch(
+          "https://guinuty-0aaf959abbbf.herokuapp.com/user/project/review",
+          {
+            body: JSON.stringify(body),
+            method: request.method,
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          },
+        );
+        const data = await response.json();
+        if (!response.ok) {
+          if (response.status === 401) {
+            localStorage.clear();
+            closeAllOffcanvas();
+            errorToast(data);
+            return redirect("/");
+          }
+          console.log(data);
+          errorToast(data);
+          return null;
+        }
+        console.log(data);
+        successToast(data);
+        return redirect(`/dashboard/project/edit/${data.projectId}`);
+      } catch (error) {
+        errorToast(error);
+        return null;
+      }
+      break;
+    }
+
+    default: {
+      try {
+        const response = await fetch(
+          "https://guinuty-0aaf959abbbf.herokuapp.com/user/settings",
+          {
+            body: JSON.stringify(body),
+            method: request.method,
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          },
+        );
+        const data = await response.json();
+        if (!response.ok) {
+          if (response.status === 401) {
+            localStorage.clear();
+            closeAllOffcanvas();
+            errorToast(data);
+            return redirect("/");
+          }
+          errorToast(data);
+          return null;
+        }
+        successToast(data);
+        return null;
+      } catch (error) {
+        errorToast(error);
+        return null;
+      }
     }
   }
 };

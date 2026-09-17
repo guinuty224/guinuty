@@ -4,18 +4,21 @@ import {
   useActionData,
   useNavigation,
   useRouteLoaderData,
+  useFetcher,
 } from "react-router-dom";
-import { Form } from "react-router-dom";
+
 import { useState } from "react";
+import today from "../utils/today";
 
 const EntrepreneurSecurityForm = () => {
+  const fetcher = useFetcher();
   const [showPassword, setShowPassword] = useState(true);
   const user = useRouteLoaderData("root-data");
-  const navigation = useNavigation();
+
   return (
     <section className={`${styles.home} pt-5 pb-5`}>
       <div className="container-fluid">
-        <small>Dimanche, 6 Avril 2026</small>
+        <small>{today()}</small>
         <h1 className="textMainGreen fw-bold">Securite</h1>
         <p>
           Ici, vous pouvez modifier vos moyens de connexion et votre mot de
@@ -23,7 +26,7 @@ const EntrepreneurSecurityForm = () => {
         </p>
         <hr />
         <div className="container bg-light p-3 rounded border">
-          <Form method="patch" action="/user">
+          <fetcher.Form method="patch" action="/dashboard">
             <input name="request" value="passwordUpdate" hidden></input>
             <div className="row">
               <div class="mb-3 col-md-6">
@@ -65,7 +68,7 @@ const EntrepreneurSecurityForm = () => {
             </div>
 
             <div className="text-end">
-              {navigation.state === "submitting" ? (
+              {fetcher.state === "submitting" ? (
                 <Button padding="px-2" type="button" disabled={true}>
                   <span
                     className="spinner-border spinner-border-sm"
@@ -79,10 +82,10 @@ const EntrepreneurSecurityForm = () => {
                 </Button>
               )}
             </div>
-          </Form>
+          </fetcher.Form>
           <hr />
-          <Form method="patch" action="/user">
-            <input name="request" value="signInOption" hidden></input>
+          <fetcher.Form method="patch" action="/dashboard">
+            <input name="request" value="signInOptionUpdate" hidden></input>
             <div className="row">
               <div class="mb-3 col-md-6">
                 <label
@@ -96,10 +99,10 @@ const EntrepreneurSecurityForm = () => {
                   aria-label="Activer ou desactiver la connexion par mot de passe..."
                   id="passwordSignIn"
                   name="passwordSignIn"
-                  defaultValue="yes"
+                  defaultValue={`${user.passwordSignIn}`}
                 >
-                  <option value="yes">🟢 OUI</option>
-                  <option value="no">🔴 NON</option>
+                  <option value="true">🟢 OUI</option>
+                  <option value="false">🔴 NON</option>
                 </select>
               </div>
               <div class="mb-3 col-md-6">
@@ -115,14 +118,15 @@ const EntrepreneurSecurityForm = () => {
                   id="otpSignIn"
                   defaultValue="yes"
                   name="otpSignIn"
+                  defaultValue={`${user.otpSignIn}`}
                 >
-                  <option value="yes">🟢 OUI</option>
-                  <option value="no">🔴 NON</option>
+                  <option value="true">🟢 OUI</option>
+                  <option value="false">🔴 NON</option>
                 </select>
               </div>
             </div>
             <div className="text-end">
-              {navigation.state === "submitting" ? (
+              {fetcher.state === "submitting" ? (
                 <Button padding="px-2" type="button" disabled={true}>
                   <span
                     className="spinner-border spinner-border-sm"
@@ -136,7 +140,7 @@ const EntrepreneurSecurityForm = () => {
                 </Button>
               )}
             </div>
-          </Form>
+          </fetcher.Form>
         </div>
       </div>
     </section>

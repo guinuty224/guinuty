@@ -9,7 +9,7 @@ import { homeMetrics, projects } from "../utils/dummyDatas";
 const Landing = () => {
   return (
     <>
-      <section className={`${styles.home}  text-light`}>
+      <section className={`${styles.home} text-light`}>
         <div className="container">
           {" "}
           <div className="row">
@@ -45,15 +45,16 @@ const Landing = () => {
                     color="outline-warning"
                     padding="px-3 py-2"
                     type="button"
+                    offcanvasId="offcanvasSignIn"
                   >
                     Soumettre un projet
                   </Button>
                 </div>
               </div>
             </div>
-            <div className="col-md-6 mt-5 mt-md-0">
+            {/* <div className="col-md-6 mt-5 mt-md-0">
               <ProjectCard {...projects[1]} />
-            </div>
+            </div> */}
           </div>
         </div>
       </section>
@@ -141,7 +142,7 @@ const Landing = () => {
           </div>
         </div>
       </section>
-      <section className={`${styles.projects} pt-5 pb-5`}>
+      {/* <section className={`${styles.projects} pt-5 pb-5`}>
         <div className="container-fluid">
           <small className="textSecondaryGreen">PROJETS EN VEDETTE</small>
           <div className="row">
@@ -171,7 +172,7 @@ const Landing = () => {
             </Link>
           </div>
         </div>
-      </section>
+      </section> */}
       <section className={`${styles.missions} pt-5 pb-5 `}>
         <div className={`container ${styles.sectionHeadTexts} pt-3 pb-3`}>
           <small className="textSecondaryGreen text-md-start">

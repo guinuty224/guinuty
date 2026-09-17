@@ -1,23 +1,17 @@
 import "./App.css";
 import Landing from "./pages/Landing";
-import Projects from "./pages/Projects";
-import Project from "./pages/Project";
+import Projects, { loader as projectsLoader } from "./pages/Projects";
 import HowItWorks from "./pages/HowItWorks";
 import AboutUs from "./pages/AboutUs";
-import Navbar from "./components/Navbar";
-import Footer from "./components/Footer";
-import { useState } from "react";
-import UploadProject from "./pages/UploadProject";
 import UserDashboard from "./pages/UserDasboard";
 import EntrepreneurPersonalForm from "./pages/EntrepreneurPersonalForm";
-import UserNavbar from "./components/userNavbar";
 import EntrepreneurSecurityForm from "./pages/EntrepreneurSecurityForm";
 import EntrepreneurNotificationForm from "./pages/EntrepreneurNotificationForm";
 import EntrepreneurKYCForm from "./pages/EntrepreneurKYCForm";
 import EntrepreneurRefund from "./pages/EntrepreneurRefund";
 import EntrepreneurInvestors from "./pages/EntrepreneurInvestors";
 import EntrepreneurUpdate from "./pages/EntrepreneurUpdate";
-
+import UploadProject from "./pages/UploadProject";
 import { action as landingWrapperAction } from "./components/LandingWrapper";
 import {
   loader as userLoader,
@@ -25,11 +19,17 @@ import {
 } from "./pages/UserDasboard";
 import { loader as usersLoader } from "./pages/EntrepreneurKYCForm";
 import { loader as userL } from "./pages/UserFile";
+import { loader as editProjectLoader } from "./pages/EditProject";
+import { loader as userProjectsLoader } from "./pages/UserProjects";
+import UserProject, { loader as userProjectLoader } from "./pages/UserProject";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import LandingWrapper from "./components/LandingWrapper";
 import EntrepreneurSettingsWrapper from "./components/EntrepreneurSettingsWrapper";
 import EntrepreneurWrapper from "./components/EntrepreneurWrapper";
 import UserFile from "./pages/UserFile";
+import EditProject from "./pages/EditProject";
+
+import UserProjects from "./pages/UserProjects";
 
 const router = createBrowserRouter([
   {
@@ -44,6 +44,7 @@ const router = createBrowserRouter([
       {
         path: "projects",
         element: <Projects />,
+        loader: projectsLoader,
       },
       {
         path: "steps",
@@ -56,11 +57,11 @@ const router = createBrowserRouter([
     ],
   },
   {
-    path: "/user",
+    path: "/dashboard",
     element: <EntrepreneurWrapper />,
     loader: userLoader,
-    id: "root-data",
     action: userAction,
+    id: "root-data",
     children: [
       {
         index: true,
@@ -106,45 +107,31 @@ const router = createBrowserRouter([
           },
         ],
       },
+      {
+        path: "projects",
+        element: <UserProjects />,
+        loader: userProjectsLoader,
+      },
+      {
+        path: "project/add",
+        element: <UploadProject />,
+      },
+      {
+        path: "project/edit/:id",
+        element: <EditProject />,
+        loader: editProjectLoader,
+      },
+      {
+        path: "project/:id",
+        element: <UserProject />,
+        loader: userProjectLoader,
+      },
     ],
   },
 ]);
 
 function App() {
   return <RouterProvider router={router} />;
-  // return (
-  //   <>
-  //     {currentView <= 4 && <Navbar activeLink={currentView} />}
-
-  //     {currentView >= 5 && <UserNavbar investor={currentView >= 14} />}
-  //     {currentView == 0 && <Landing />}
-  //     {currentView == 1 && <Projects />}
-  //     {currentView == 2 && <HowItWorks />}
-  //     {currentView == 3 && <AboutUs />}
-  //     {currentView == 4 && <Project />}
-  //     {currentView == 5 && <UploadProject />}
-  //     {currentView == 6 && <EntrepreneurDashboard />}
-  //     {currentView == 7 && <EntrepreneurPersonalForm />}
-  //     {currentView == 8 && <EntrepreneurSecurityForm />}
-  //     {currentView == 9 && <EntrepreneurNotificationForm />}
-  //     {currentView == 10 && <EntrepreneurKYCForm />}
-  //     {currentView == 11 && <EntrepreneurRefund />}
-  //     {currentView == 12 && <EntrepreneurInvestors />}
-  //     {currentView == 13 && <EntrepreneurUpdate />}
-  //     {currentView == 14 && <InvestorDashboard />}
-  //     {currentView == 15 && <InvestorInvestments />}
-  //     {currentView == 16 && <InvestorRefund />}
-  //     {currentView == 17 && <InvestorUpdate />}
-  //     {currentView == 18 && <InvestorPersonalForm />}
-  //     {currentView == 19 && <InvestorSecurityForm />}
-  //     {currentView == 20 && <InvestorNotificationForm />}
-  //     {currentView == 21 && <InvestorKYCForm />}
-  //     <Footer
-  //       userAuth={currentView > 4}
-  //       onScreenChange={(id) => setCurrentView(id)}
-  //     />
-  //   </>
-  // );
 }
 
 export default App;

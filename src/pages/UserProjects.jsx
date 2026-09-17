@@ -1,10 +1,15 @@
 import { v4 as uuid } from "uuid";
 import ProjectCard from "../components/ProjectCard";
 import styles from "./Projects.module.css";
+import getLocalStorage from "../utils/getLocalStorage";
+import { Link, useLoaderData } from "react-router-dom";
 import { infoToast } from "../utils/toast";
 import { redirect } from "react-router-dom";
 
-const Projects = () => {
+const UserProjects = () => {
+  const { projects } = useLoaderData();
+  const { role } = getLocalStorage();
+
   return (
     <>
       <section
@@ -16,17 +21,23 @@ const Projects = () => {
               La 1re plateforme de financement participatif hybride en Guinée
             </marquee>
           </span>
-          <h1 className="text-white mt-3 mb-3">
-            Explorez les projets à financer
-          </h1>
-
-          <p className="text-white">
-            Choisissez un projet, investissez à partir de 5 000 000 GNF et
-            suivez votre rendement.
-          </p>
+          {role === "entrepreneur" && (
+            <>
+              <h1 className="text-white mt-3 mb-3">Explorez vos projets</h1>
+              <p className="text-white">
+                Vous trouverez ici la liste de vos projet quelque soit le status
+              </p>
+            </>
+          )}
+          {role === "investor" && (
+            <>
+              <h1 className="text-white mt-3 mb-3">Explorez nos projets</h1>
+              <p className="text-white">
+                Vous trouverez ici les projets verifier et pret a etre financer
+              </p>
+            </>
+          )}
         </div>
-        <div id="greenCircle" className="rounded-circle "></div>
-        <div id="yellowCircle" className="rounded-circle"></div>
       </section>
       <section className={`${styles.projects} pt-5 pb-5`}>
         <div className="container-fluid">
@@ -118,15 +129,25 @@ const Projects = () => {
             </div>
           </div>
           <div className="text-start mt-3 mb-3">
-            <small>
-              <span className="fw-bold textMainGreen">6 projets</span>{" "}
-              disponibles.
-            </small>
+            {role === "entrepreneur" && (
+              <small>
+                Vous avez{" "}
+                <span className="fw-bold textMainGreen">
+                  {projects.length} projet(s)
+                </span>{" "}
+                sur GUINUTY.
+              </small>
+            )}
           </div>
           <div className="row">
             {projects.map((project) => (
               <div key={uuid()} className="col-lg-4 mb-3">
-                <ProjectCard {...project} />
+                <Link
+                  className="text-decoration-none"
+                  to={`/dashboard/project/${project._id}`}
+                >
+                  <ProjectCard {...project} />
+                </Link>
               </div>
             ))}
           </div>
@@ -136,8 +157,42 @@ const Projects = () => {
   );
 };
 
-export default Projects;
+export default UserProjects;
 export const loader = async ({ request, params }) => {
-  infoToast({ message: "Aucun projet accessible pour le moment !" });
-  return redirect("/");
+  if (!getLocalStorage()) {
+    return redirect("/");
+  }
+  const { token } = getLocalStorage();
+  try {
+    const response = await fetch(
+      `https://guinuty-0aaf959abbbf.herokuapp.com/user/projects`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
+    const data = await response.json();
+    if (!response.ok) {
+      if (response.status === 401) {
+        localStorage.clear();
+        closeAllOffcanvas();
+        errorToast(data);
+        return redirect("/");
+      }
+      errorToast(data);
+      return null;
+    }
+    console.log(data);
+    if (data.projects.length === 0) {
+      infoToast({ message: "Vous n'avez aucun projet pour le moment." });
+      return redirect("/dashboard");
+    }
+
+    return data;
+  } catch (error) {
+    errorToast(error);
+    return null;
+  }
 };

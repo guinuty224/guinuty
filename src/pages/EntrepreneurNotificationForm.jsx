@@ -1,4 +1,5 @@
 import Button from "../components/Button";
+import today from "../utils/today";
 import styles from "./EntrepreneurNotificationForm.module.css";
 
 import { useState } from "react";
@@ -7,7 +8,7 @@ const EntrepreneurNotificationForm = () => {
   return (
     <section className={`${styles.home} pt-5 pb-5`}>
       <div className="container-fluid">
-        <small>Dimanche, 6 Avril 2026</small>
+        <small>{today()}</small>
         <h1 className="textMainGreen fw-bold">Notifications</h1>
         <p>Ici, vous pouvez modifier vos parametre de notifications.</p>
         <hr />

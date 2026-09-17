@@ -1,28 +1,22 @@
-import { useState } from "react";
 import Button from "./Button";
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useNavigation } from "react-router-dom";
 import Offcanvas from "./Offcanvas";
-import EntrepreneurOffcanvasItems from "./EntrepreneurOffcanvasItems";
-import { useNavigate } from "react-router-dom";
+import UserOffcanvasItems from "./UserOffcanvasItems";
 import Swal from "sweetalert2";
 const UserNavbar = () => {
-  const [activeButton, setActiveButton] = useState(null);
-  const storedUser = localStorage.getItem("userData");
-  const userData = storedUser ? JSON.parse(storedUser) : null;
   const navigate = useNavigate();
-  const role = userData.role;
-
+  const navigation = useNavigation();
   return (
-    <nav class="navbar bg-body-tertiary sticky-top">
-      <div class="container-fluid">
-        <a class="navbar-brand" href="#">
+    <nav className="navbar bg-body-tertiary sticky-top">
+      <div className="container-fluid">
+        <a className="navbar-brand" href="#">
           GUINUTY
         </a>
         <Button offcanvasId="userOffcanvasNavbar" type="button">
           ☰ MENU
         </Button>
         <Offcanvas title="USERNAME" id="userOffcanvasNavbar">
-          <EntrepreneurOffcanvasItems role={role} />
+          <UserOffcanvasItems />
           <hr />
           <Link to="settings">
             <Button
@@ -34,7 +28,7 @@ const UserNavbar = () => {
               fWeight="bold"
             >
               <span className="bg-white p-1 rounded">👤</span> Informations
-              personelles
+              personelles{" "}
             </Button>
           </Link>
           <Link to="settings/security">
@@ -61,33 +55,14 @@ const UserNavbar = () => {
               <span className="bg-white p-1 rounded">🔔</span> Notifications
             </Button>
           </Link>
-          {role === "administrator" && (
-            <Link to="users">
-              <Button
-                width="100"
-                tPosition="start"
-                color="outline-success"
-                border="border-0"
-                rounded="rounded-0"
-                fWeight="bold"
-              >
-                <span className="bg-white p-1 rounded">🪪</span> Liste des
-                utilisateurs
-              </Button>
-            </Link>
-          )}
           <hr />
           <Button
-            width={100}
+            width="100"
             tPosition="start"
             color="outline-danger"
-            border={0}
-            rounded={0}
+            rounded="rounded-0"
             fWeight="bold"
-            pStart={2}
-            pEnd={2}
-            pBottom={2}
-            pTop={2}
+            padding="p-2"
             type="button"
             onClick={() => {
               localStorage.clear();
@@ -105,7 +80,7 @@ const UserNavbar = () => {
             }}
           >
             <span className="bg-white p-1 rounded">🚪</span> Déconnexion
-          </Button>{" "}
+          </Button>
         </Offcanvas>
       </div>
     </nav>

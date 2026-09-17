@@ -1,21 +1,25 @@
 import Button from "../components/Button";
 import TextEditor from "../components/TextEditor";
-import { useFetcher } from "react-router-dom";
+import { useFetcher, useLoaderData } from "react-router-dom";
 import { v4 as uuid } from "uuid";
 import styles from "./UploadProject.module.css";
 import sectors from "../utils/sectors";
 import { useState } from "react";
 import projectTypes from "../utils/projectTypes";
+import getLocalStorage from "../utils/getLocalStorage";
+import { errorToast, successToast } from "../utils/toast";
 import { FileUploaderRegular } from "@uploadcare/react-uploader";
-import "@uploadcare/react-uploader/core.css";
 import guineaLocations from "../utils/guineaLocations";
+import { redirect } from "react-router-dom";
+import "@uploadcare/react-uploader/core.css";
 
-const UploadProject = () => {
+const EditProject = () => {
+  const project = useLoaderData();
   const [images, setImages] = useState([]);
-  const [rccm, setRccm] = useState("");
-  const [type, setType] = useState("donation");
-
+  const [rccm, setRccm] = useState(project.type.rccmDocumentUrl);
+  const [type, setType] = useState(project.type);
   const fetcher = useFetcher();
+
   const handleIdUploadSuccess = (state) => {
     const file = state.successEntries.map(({ uuid, cdnUrl }) => ({
       uuid,
@@ -28,16 +32,13 @@ const UploadProject = () => {
       uuid,
       cdnUrl,
     }));
-    const newImages = [];
-    file.forEach((element) => {
-      newImages.push(element.uuid);
-    });
+    const newImages = file.map((image) => image.uuid);
     setImages(newImages);
   };
-  console.log(images);
   const handleType = (e) => {
     setType(e.target.value);
   };
+
   return (
     <>
       <section
@@ -49,21 +50,26 @@ const UploadProject = () => {
               La 1re plateforme de financement participatif hybride en Guinée
             </marquee>
           </span>
-          <h1 className="text-white mt-3 mb-3">
-            Faites financer votre projet par la communaute
-          </h1>
+          <h1 className="text-white mt-3 mb-3">Modifier votre projet</h1>
 
           <p className="text-white">
-            Remplissez ce formulaire. Notre comite d'investissement etudie
-            chaque dossier et revient vers vous sous 7 jours ouvres.
+            Votre projet sera vérifié automatiquement dès la soumission.
+            <br />
+            Si des ajustements sont nécessaires, les consignes s'afficheront
+            ci-dessous.
           </p>
         </div>
       </section>
       <section className={`${styles.forms} pt-5 pb-5`}>
         <div className="container">
+          <div className="bg-white p-3 rounded mb-3 border">
+            <h2 className="fw-bold textMainGreen">Analise IA</h2>
+            <p className="fw-bold text-danger">{project.kycAudit.feedback}</p>
+            <hr />
+          </div>
           <fetcher.Form method="POST" action="/dashboard">
             <input name="images" value={JSON.stringify(images)} hidden />
-
+            <input name="projectId" value={project._id} hidden />
             <div className="bg-white p-3 rounded mb-3 border">
               <h2 className="fw-bold textMainGreen">Le projet</h2>
               <small>Decrivez ce que vous voulez financer</small>
@@ -83,6 +89,7 @@ const UploadProject = () => {
                       className="form-control"
                       id="title"
                       name="title"
+                      defaultValue={project.title}
                       placeholder="Ex : Agrandissement des salles de classe"
                       required
                     />
@@ -130,6 +137,7 @@ const UploadProject = () => {
                       aria-label="Choisir le secteur..."
                       id="sector"
                       name="sector"
+                      defaultValue={project.sector}
                       required
                     >
                       {sectors.map((sector) => (
@@ -152,6 +160,7 @@ const UploadProject = () => {
                       className="form-select"
                       aria-label="Choisir le lieu..."
                       id="location"
+                      defaultValue={project.location}
                       name="location"
                       required
                     >
@@ -171,11 +180,28 @@ const UploadProject = () => {
                 >
                   Description du projet
                 </label>
-                <TextEditor name="description" />
+                <TextEditor
+                  name="description"
+                  defaultValue={project.description}
+                />
               </div>
               <hr />
               <label className="form-label fw-bold textMainGreen">
-                Ajouter au moins une image
+                Les precedentes images
+              </label>
+              <div className="row">
+                {project.images.map((image) => (
+                  <div className="col-2">
+                    <img
+                      src={`https://3emyy40jt3.ucarecd.net/${image}/`}
+                      class="img-thumbnail"
+                    />
+                  </div>
+                ))}
+              </div>
+              <hr />
+              <label className="form-label fw-bold textMainGreen">
+                Ajouter de nouvelle images{" "}
                 <span className="text-warning fw-bold">(3 max)</span>
                 <FileUploaderRegular
                   pubkey="36702f41b78321885c1e"
@@ -221,6 +247,7 @@ const UploadProject = () => {
                         className="form-control"
                         id="goal"
                         name="goal"
+                        defaultValue={project.goal}
                         placeholder="Ex : 1 200 000 000"
                         required
                       />
@@ -240,6 +267,7 @@ const UploadProject = () => {
                         min={30}
                         id="campaignDuration"
                         name="campaignDuration"
+                        defaultValue={project.campaignDuration}
                         placeholder="Ex : 30 "
                         required
                       />
@@ -254,6 +282,7 @@ const UploadProject = () => {
                     </label>
                     <TextEditor
                       name="fundingUsage"
+                      defaultValue={project.fundingUsage}
                       placeholder="Explication de l'utilisation des dons..."
                     />
                   </div>
@@ -274,6 +303,7 @@ const UploadProject = () => {
                         className="form-control"
                         id="sharePrice"
                         name="sharePrice"
+                        defaultValue={project.sharePrice}
                         placeholder="Ex : 100000"
                         required
                       />
@@ -292,6 +322,7 @@ const UploadProject = () => {
                         className="form-control"
                         id="totalSharesOffered"
                         name="totalSharesOffered"
+                        defaultValue={project.totalSharesOffered}
                         placeholder="Ex : 100"
                         required
                       />
@@ -310,6 +341,7 @@ const UploadProject = () => {
                         className="form-control"
                         id="rccmNumber"
                         name="rccmNumber"
+                        defaultValue={project.rccmNumber}
                         placeholder="Ex : GN.TTC.2019.A.02830"
                         required
                       />
@@ -334,11 +366,15 @@ const UploadProject = () => {
                         useLocalImageEditor={false}
                         localeName="fr"
                       />
-                      <input name="rccmDocumentUrl" value={rccm} hidden />
-                      {rccm && (
+                      <input
+                        name="rccmDocumentUrl"
+                        value={JSON.stringify(rccm)}
+                        hidden
+                      />
+                      {rccm[0] && (
                         <a
                           className="btn btn-sm btn-dark rounded mt-2"
-                          href={`https://3emyy40jt3.ucarecd.net/${rccm}/`}
+                          href={rccm[0].cdnUrl}
                           target="_blank"
                           rel="noopener noreferrer"
                         >
@@ -355,6 +391,7 @@ const UploadProject = () => {
                       Affectation des fonds
                     </label>
                     <TextEditor
+                      defaultValue={project.fundingUsage}
                       name="fundingUsage"
                       placeholder="Utilisation du capital levé (ex: 40% R&D, 30% Recrutement, 30% Expansion commerciale)...."
                     />
@@ -398,4 +435,45 @@ const UploadProject = () => {
   );
 };
 
-export default UploadProject;
+export default EditProject;
+export const loader = async ({ request, params }) => {
+  if (!getLocalStorage()) {
+    return redirect("/");
+  }
+  const { token } = getLocalStorage();
+  try {
+    const response = await fetch(
+      `https://guinuty-0aaf959abbbf.herokuapp.com/user/project/edit/${params.id}`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
+    const data = await response.json();
+    if (!response.ok) {
+      if (response.status === 401) {
+        localStorage.clear();
+        closeAllOffcanvas();
+        errorToast(data);
+        return redirect("/");
+      }
+      errorToast(data);
+      return null;
+    }
+    if (data.status === "pendingPayment") {
+      successToast({
+        message:
+          "Le projet a passé avec succès l'étape de vérification par notre IA.",
+      });
+      return redirect(
+        `https://guinuty-0aaf959abbbf.herokuapp.com/user/project/${data._id}`,
+      );
+    }
+    return data;
+  } catch (error) {
+    errorToast(error);
+    return null;
+  }
+};

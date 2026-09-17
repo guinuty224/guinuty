@@ -108,3 +108,9 @@
 .bg-success-gradient2 {
   background: linear-gradient(140deg, #214a53, #0c1f24);
 }
+.clean-text-wrap,
+.clean-text-wrap * {
+  overflow-wrap: break-word !important;
+  word-break: normal !important;
+  white-space: normal !important;
+}

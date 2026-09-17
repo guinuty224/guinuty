@@ -196,7 +196,7 @@ export const loader = async ({ request, params }) => {
   }
   try {
     const response = await fetch(
-      `http://localhost:8000/user/users/${params.id}`,
+      `https://guinuty-0aaf959abbbf.herokuapp.com/user/users/${params.id}`,
       {
         method: "GET",
         headers: {

@@ -2,32 +2,22 @@ import MetricCard from "./MetricCard";
 import FundingProgressBar from "./FundingProgressBar";
 import InvestmentForm from "./InvestmentForm";
 import { useState } from "react";
+import Button from "./Button";
 const FundingCard = ({
   goal,
   collected,
-  duration,
+  campaignDuration,
+  kycAudit,
   efficiency,
-  investors = 0,
+  investors,
   remainingDays = 0,
   remainingParts,
   leaveCapital,
   investmentType,
 }) => {
-  const [projectType, setProjectType] = useState("donation");
-  const changeType = () => {
-    if (projectType === "donation") {
-      setProjectType("loan");
-    }
-    if (projectType === "loan") {
-      setProjectType("equity");
-    }
-    if (projectType === "equity") {
-      setProjectType("donation");
-    }
-  };
   return (
-    <div onClick={changeType} role="button" className="card fundingCard">
-      <div className="card-body">
+    <div role="button" className="card fundingCard">
+      {/* <div className="card-body">
         <small>Collecté</small>
         <p>
           <span className="textMainGreen fs-4">{collected}</span>{" "}
@@ -62,6 +52,29 @@ const FundingCard = ({
           )}
         </div>
         <InvestmentForm investmentType={projectType} />
+      </div> */}
+      <div className="card-body">
+        <h2 className="textMainGreen">Analyse IA</h2>
+        <p className="text-success">{kycAudit.feedback}</p>
+        <Link>
+          <Button color="outline-success">Modifier mon projet</Button>
+        </Link>
+        <hr />
+        <div className="bg-success-gradient2 rounded p-3 text-light fw-bold">
+          <ul>
+            <li>
+              💰 Payez dès maintenant les frais de publication pour ouvrir les
+              contributions publiques !
+            </li>
+            <li>
+              📌 Note : La durée de votre campagne commencera uniquement après
+              le règlement des frais.
+            </li>
+          </ul>
+          <Button width="100" color="warning">
+            Payer 1000000
+          </Button>
+        </div>
       </div>
     </div>
   );

@@ -1,12 +1,12 @@
 import Button from "./Button";
 import { Link } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
-import Swal from "sweetalert2";
-const EntrepreneurOffcanvasItems = ({ role }) => {
-  const navigate = useNavigate();
+import getLocalStorage from "../utils/getLocalStorage";
+
+const UserOffcanvasItems = () => {
+  const { role } = getLocalStorage();
   return (
     <>
-      <Link to="/user">
+      <Link to="/dashboard">
         <Button
           width="100"
           tPosition="start"
@@ -18,6 +18,7 @@ const EntrepreneurOffcanvasItems = ({ role }) => {
           <span className="bg-white p-1 rounded">📊</span> Vue d'ensemble
         </Button>
       </Link>
+      <hr />
       <Link to="projects">
         <Button
           width="100"
@@ -27,10 +28,10 @@ const EntrepreneurOffcanvasItems = ({ role }) => {
           rounded="rounded-0"
           fWeight="bold"
         >
-          <span className="bg-white p-1 rounded">🗄️</span> Projets
+          <span className="bg-white p-1 rounded">📑</span> Projets
         </Button>
       </Link>
-      <Link>
+      <Link to="project/add">
         <Button
           width="100"
           tPosition="start"
@@ -39,14 +40,12 @@ const EntrepreneurOffcanvasItems = ({ role }) => {
           rounded="rounded-0"
           fWeight="bold"
         >
-          <span className="bg-white p-1 rounded">💰</span>
-          {role === "investor" || role === "administrator"
-            ? " Investissements"
-            : " Investisseurs"}
+          <span className="bg-white p-1 rounded">📝</span> Ajouter un projet
         </Button>
       </Link>
+      <hr />
       {role === "administrator" ? (
-        <Link>
+        <Link to="users">
           <Button
             width="100"
             tPosition="start"
@@ -55,12 +54,24 @@ const EntrepreneurOffcanvasItems = ({ role }) => {
             rounded="rounded-0"
             fWeight="bold"
           >
-            <span className="bg-white p-1 rounded">🧾</span> Utilisateurs
+            <span className="bg-white p-1 rounded">🪪</span> Utilisateurs
           </Button>
         </Link>
       ) : (
         <>
-          <Link>
+          <Link to="investments">
+            <Button
+              width="100"
+              tPosition="start"
+              color="outline-success"
+              border="border-0"
+              rounded="rounded-0"
+              fWeight="bold"
+            >
+              <span className="bg-white p-1 rounded">💰</span> Investissements
+            </Button>
+          </Link>
+          <Link to="refund">
             <Button
               width="100"
               tPosition="start"
@@ -72,6 +83,7 @@ const EntrepreneurOffcanvasItems = ({ role }) => {
               <span className="bg-white p-1 rounded">🧾</span> Remboursements
             </Button>
           </Link>
+          <Link to="progress"></Link>
           <Button
             width="100"
             tPosition="start"
@@ -87,4 +99,4 @@ const EntrepreneurOffcanvasItems = ({ role }) => {
     </>
   );
 };
-export default EntrepreneurOffcanvasItems;
+export default UserOffcanvasItems;
