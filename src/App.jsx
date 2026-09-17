@@ -31,104 +31,110 @@ import EditProject from "./pages/EditProject";
 
 import UserProjects from "./pages/UserProjects";
 
-const router = createBrowserRouter([
+const router = createBrowserRouter(
+  [
+    {
+      path: "/",
+      element: <LandingWrapper />,
+      action: landingWrapperAction,
+      children: [
+        {
+          index: true,
+          element: <Landing />,
+        },
+        {
+          path: "projects",
+          element: <Projects />,
+          loader: projectsLoader,
+        },
+        {
+          path: "steps",
+          element: <HowItWorks />,
+        },
+        {
+          path: "about",
+          element: <AboutUs />,
+        },
+      ],
+    },
+    {
+      path: "/dashboard",
+      element: <EntrepreneurWrapper />,
+      loader: userLoader,
+      action: userAction,
+      id: "root-data",
+      children: [
+        {
+          index: true,
+          element: <UserDashboard />,
+        },
+        {
+          path: "investors",
+          element: <EntrepreneurInvestors />,
+        },
+        {
+          path: "refunds",
+          element: <EntrepreneurRefund />,
+        },
+        {
+          path: "updates",
+          element: <EntrepreneurUpdate />,
+        },
+        {
+          path: "users",
+          element: <EntrepreneurKYCForm />,
+          loader: usersLoader,
+        },
+        {
+          path: "users/:id",
+          element: <UserFile />,
+          loader: userL,
+        },
+        {
+          path: "settings",
+          element: <EntrepreneurSettingsWrapper />,
+          children: [
+            {
+              index: true,
+              element: <EntrepreneurPersonalForm />,
+            },
+            {
+              path: "notifications",
+              element: <EntrepreneurNotificationForm />,
+            },
+            {
+              path: "security",
+              element: <EntrepreneurSecurityForm />,
+            },
+          ],
+        },
+        {
+          path: "projects",
+          element: <UserProjects />,
+          loader: userProjectsLoader,
+        },
+        {
+          path: "project/add",
+          element: <UploadProject />,
+        },
+        {
+          path: "project/edit/:id",
+          element: <EditProject />,
+          loader: editProjectLoader,
+        },
+        {
+          path: "project/:id",
+          element: <UserProject />,
+          loader: userProjectLoader,
+        },
+      ],
+    },
+  ],
   {
-    path: "/",
-    element: <LandingWrapper />,
-    action: landingWrapperAction,
-    children: [
-      {
-        index: true,
-        element: <Landing />,
-      },
-      {
-        path: "projects",
-        element: <Projects />,
-        loader: projectsLoader,
-      },
-      {
-        path: "steps",
-        element: <HowItWorks />,
-      },
-      {
-        path: "about",
-        element: <AboutUs />,
-      },
-    ],
+    // Automatically handles the /guinuty repository subpath on GitHub Pages
+    basename: "/guinuty",
   },
-  {
-    path: "/dashboard",
-    element: <EntrepreneurWrapper />,
-    loader: userLoader,
-    action: userAction,
-    id: "root-data",
-    children: [
-      {
-        index: true,
-        element: <UserDashboard />,
-      },
-      {
-        path: "investors",
-        element: <EntrepreneurInvestors />,
-      },
-      {
-        path: "refunds",
-        element: <EntrepreneurRefund />,
-      },
-      {
-        path: "updates",
-        element: <EntrepreneurUpdate />,
-      },
-      {
-        path: "users",
-        element: <EntrepreneurKYCForm />,
-        loader: usersLoader,
-      },
-      {
-        path: "users/:id",
-        element: <UserFile />,
-        loader: userL,
-      },
-      {
-        path: "settings",
-        element: <EntrepreneurSettingsWrapper />,
-        children: [
-          {
-            index: true,
-            element: <EntrepreneurPersonalForm />,
-          },
-          {
-            path: "notifications",
-            element: <EntrepreneurNotificationForm />,
-          },
-          {
-            path: "security",
-            element: <EntrepreneurSecurityForm />,
-          },
-        ],
-      },
-      {
-        path: "projects",
-        element: <UserProjects />,
-        loader: userProjectsLoader,
-      },
-      {
-        path: "project/add",
-        element: <UploadProject />,
-      },
-      {
-        path: "project/edit/:id",
-        element: <EditProject />,
-        loader: editProjectLoader,
-      },
-      {
-        path: "project/:id",
-        element: <UserProject />,
-        loader: userProjectLoader,
-      },
-    ],
-  },
-]);
+);
 
 function App() {
   return <RouterProvider router={router} />;
